@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
     Grid, List, Plus, Image as ImageIcon, Calendar as CalendarIcon, 
-    MoreHorizontal, Clock, LayoutGrid, Move, Trash2,
+    MoreHorizontal, Clock, LayoutGrid, Move, Trash2, Smartphone, 
     Save, X, Rabbit, ChevronLeft, ChevronRight, Filter,
     Video, Mic, Edit3, Share, CheckCircle2, Circle,
-    Building2, Briefcase, Settings, LogOut, AlertTriangle, Menu, ChevronDown
+    Building2, Briefcase, Settings, LogOut, AlertTriangle, Menu, ChevronDown, 
+    Sparkles, ArrowRight
 } from 'lucide-react';
 
 // --- ESTILOS GLOBALES ---
@@ -15,33 +16,27 @@ const GlobalStyles = () => (
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
-        .animate-fade-in { animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .animate-slide-up { animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Sidebar Tooltip Hack */
+        .sidebar-tooltip-group:hover .sidebar-tooltip { opacity: 1; transform: translateX(0); }
     `}</style>
 );
 
 // --- ICONOS DE REDES SOCIALES ---
 const SocialIcons = {
-    instagram: ({ className }) => (
-        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-    ),
-    tiktok: ({ className }) => (
-        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>
-    ),
-    facebook: ({ className }) => (
-        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-    ),
-    twitter: ({ className }) => ( // X logo approximation
-        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16z" /><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" /></svg>
-    ),
-    youtube: ({ className }) => (
-        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
-    ),
-    linkedin: ({ className }) => (
-        <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
-    )
+    instagram: ({ className }) => (<svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>),
+    tiktok: ({ className }) => (<svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"></path></svg>),
+    facebook: ({ className }) => (<svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>),
+    twitter: ({ className }) => (<svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4l11.733 16h4.267l-11.733 -16z" /><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" /></svg>),
+    youtube: ({ className }) => (<svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>),
+    linkedin: ({ className }) => (<svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>)
 };
 
+// --- CONSTANTES ---
 const PLATFORMS = [
     { id: 'instagram', label: 'Instagram', color: 'text-pink-500', bg: 'bg-pink-500/10' },
     { id: 'tiktok', label: 'TikTok', color: 'text-teal-400', bg: 'bg-teal-400/10' },
@@ -52,27 +47,17 @@ const PLATFORMS = [
 ];
 
 const STATUS_COLUMNS = [
-    { id: 'start', label: 'Por Empezar', icon: Circle, color: 'border-slate-500', textColor: 'text-slate-400' },
-    { id: 'recording', label: 'Grabar', icon: Video, color: 'border-red-500', textColor: 'text-red-400' },
-    { id: 'editing', label: 'Editar', icon: Edit3, color: 'border-blue-500', textColor: 'text-blue-400' },
-    { id: 'publishing', label: 'Publicar', icon: Share, color: 'border-green-500', textColor: 'text-green-400' }
+    { id: 'pending', label: 'Pendiente', icon: Circle, color: 'border-slate-500', textColor: 'text-slate-400' },
+    { id: 'in_process', label: 'En Proceso', icon: Edit3, color: 'border-blue-500', textColor: 'text-blue-400' },
+    { id: 'ready', label: 'Listo', icon: CheckCircle2, color: 'border-emerald-500', textColor: 'text-emerald-400' },
+    { id: 'published', label: 'Publicado', icon: Share, color: 'border-green-600', textColor: 'text-green-600' }
 ];
 
-// --- DATOS INICIALES ---
-const INITIAL_COMPANIES = [
-    { id: 1, name: "Rabbit Corp", color: "bg-indigo-600", initials: "RC" },
-    { id: 2, name: "Acme Store", color: "bg-emerald-600", initials: "AS" },
-];
+// --- DATOS INICIALES (VACÍOS) ---
+const INITIAL_COMPANIES = []; // Comienza limpio
+const INITIAL_POSTS = [];     // Comienza limpio
 
-const INITIAL_POSTS = [
-    { id: 1, companyId: 1, title: "Lanzamiento Producto", platform: 'instagram', type: "Reel", status: "publishing", image: null, date: "2025-10-25", caption: "¡Ya está aquí! 🔥 #lanzamiento" },
-    { id: 2, companyId: 1, title: "Vlog Semanal", platform: 'youtube', type: "Video", status: "editing", image: null, date: "2025-10-26", caption: "Editando el vlog de la semana..." },
-    { id: 3, companyId: 2, title: "Promo Verano", platform: 'tiktok', type: "Short", status: "recording", image: null, date: "2025-10-27", caption: "Descuentos locos 💃" },
-    { id: 4, companyId: 2, title: "Anuncio Apertura", platform: 'facebook', type: "Post", status: "start", image: null, date: "2025-10-28", caption: "Abrimos puertas." },
-];
-
-// --- COMPONENTES AUXILIARES ---
-
+// Helper Component
 const PlatformIcon = ({ platformId, className = "w-4 h-4" }) => {
     const Icon = SocialIcons[platformId] || SocialIcons.instagram;
     const plat = PLATFORMS.find(p => p.id === platformId) || PLATFORMS[0];
@@ -179,9 +164,9 @@ const CalendarView = ({ posts, onEditPost, onNewPost, currentCompany }) => {
                                         key={post.id} 
                                         onClick={(e) => { e.stopPropagation(); onEditPost(post); }}
                                         className={`text-[9px] p-1 rounded border-l-2 flex items-center gap-1 truncate transition hover:scale-105 ${
-                                            post.status === 'publishing' ? 'bg-green-500/10 border-green-500 text-green-200' :
-                                            post.status === 'recording' ? 'bg-red-500/10 border-red-500 text-red-200' :
-                                            post.status === 'editing' ? 'bg-blue-500/10 border-blue-500 text-blue-200' :
+                                            post.status === 'published' ? 'bg-green-500/10 border-green-500 text-green-200' :
+                                            post.status === 'in_process' ? 'bg-blue-500/10 border-blue-500 text-blue-200' :
+                                            post.status === 'ready' ? 'bg-emerald-500/10 border-emerald-500 text-emerald-200' :
                                             'bg-slate-700 border-slate-500 text-slate-300'
                                         }`}
                                     >
@@ -278,7 +263,6 @@ const CalendarView = ({ posts, onEditPost, onNewPost, currentCompany }) => {
     return (
         <div className="animate-fade-in h-full flex flex-col">
             {renderHeader()}
-            {/* CORRECCIÓN SCROLL: flex-1 y overflow-auto aquí permite que ESTE contenedor haga scroll, no el body */}
             <div className="flex-1 overflow-y-auto custom-scrollbar pb-32 md:pb-10"> 
                 {viewMode === 'month' && renderMonthView()}
                 {viewMode === 'week' && renderWeekView()}
@@ -323,7 +307,6 @@ const ConfirmModal = ({ isOpen, title, message, onConfirm, onClose, isAlert }) =
         </div>
     );
 };
-
 
 // --- MODAL CREAR EMPRESA ---
 const CompanyModal = ({ isOpen, onClose, onSave }) => {
@@ -378,7 +361,6 @@ const EditModal = ({ post, isOpen, onClose, onSave, onDelete }) => {
     if (!isOpen || !post) return null;
     const [formData, setFormData] = useState({ ...post });
     
-    // ... lógica del modal original ...
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
@@ -406,7 +388,6 @@ const EditModal = ({ post, isOpen, onClose, onSave, onDelete }) => {
                     <button onClick={onClose} className="p-2 hover:bg-slate-800 rounded-full text-slate-400 hover:text-white transition"><X size={20} /></button>
                 </div>
                 <div className="p-6 space-y-6 overflow-y-auto flex-1 custom-scrollbar">
-                    {/* Campos resumidos */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                              <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Plataforma</label>
@@ -459,18 +440,28 @@ const App = () => {
     const [posts, setPosts] = useState(INITIAL_POSTS);
     
     // ESTADOS DE UI
-    const [selectedCompanyId, setSelectedCompanyId] = useState(1);
+    const [selectedCompanyId, setSelectedCompanyId] = useState(null);
     const [view, setView] = useState('calendar'); 
     const [editingPost, setEditingPost] = useState(null);
     const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
     const [isCompanyDropdownOpen, setIsCompanyDropdownOpen] = useState(false); 
-    const [hoveredCompany, setHoveredCompany] = useState(null); // Nuevo estado para Tooltip flotante
+    const [hoveredCompany, setHoveredCompany] = useState(null);
     
     const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: "", message: "", onConfirm: () => {}, isAlert: false });
 
+    // ESTADO CERO: Si no hay empresas
+    const isZeroState = companies.length === 0;
+
     // Helpers
-    const currentCompany = companies.find(c => c.id === selectedCompanyId) || companies[0];
+    const currentCompany = companies.find(c => c.id === selectedCompanyId);
     const filteredPosts = useMemo(() => posts.filter(p => p.companyId === selectedCompanyId), [posts, selectedCompanyId]);
+
+    // Initial Load Logic
+    useEffect(() => {
+        if (companies.length > 0 && selectedCompanyId === null) {
+            setSelectedCompanyId(companies[0].id);
+        }
+    }, [companies]);
 
     // Handlers
     const handleAddCompany = (newCompanyData) => {
@@ -484,26 +475,20 @@ const App = () => {
     };
 
     const handleDeleteCompany = (id) => {
-        if(companies.length <= 1) {
-            setConfirmConfig({
-                isOpen: true,
-                title: "Acción no permitida",
-                message: "No puedes eliminar la última empresa activa. Debes tener al menos una.",
-                onConfirm: () => {},
-                isAlert: true
-            });
-            return;
-        }
-        
+        // En este modo limpio, permitimos borrar todo hasta quedar en 0
         setConfirmConfig({
             isOpen: true,
             title: "¿Eliminar empresa?",
-            message: "Esta acción borrará la empresa y TODOS sus proyectos de forma permanente. ¿Estás seguro?",
+            message: "Esta acción borrará la empresa y TODOS sus proyectos. ¿Estás seguro?",
             onConfirm: () => {
                 const newCompanies = companies.filter(c => c.id !== id);
                 setCompanies(newCompanies);
                 setPosts(posts.filter(p => p.companyId !== id));
-                if(selectedCompanyId === id) setSelectedCompanyId(newCompanies[0].id);
+                if(newCompanies.length > 0 && selectedCompanyId === id) {
+                    setSelectedCompanyId(newCompanies[0].id);
+                } else if (newCompanies.length === 0) {
+                    setSelectedCompanyId(null);
+                }
             }
         });
     };
@@ -521,10 +506,11 @@ const App = () => {
     };
 
     const handleNewPost = (date = new Date()) => {
+        if(!selectedCompanyId) return;
         const dateStr = date.toISOString().split('T')[0];
         setEditingPost({
             id: Date.now(), companyId: selectedCompanyId, title: "", platform: 'instagram', 
-            type: "Post", status: "start", image: null, date: dateStr, caption: ""
+            type: "Post", status: "pending", image: null, date: dateStr, caption: ""
         });
     };
 
@@ -550,7 +536,7 @@ const App = () => {
         <div className="flex h-screen bg-slate-950 text-slate-50 font-sans selection:bg-indigo-500/30 overflow-hidden relative">
             <GlobalStyles />
             
-            {/* TOOLTIP FLOTANTE (Renderizado fuera del sidebar para evitar clipping) */}
+            {/* TOOLTIP FLOTANTE */}
             {hoveredCompany && (
                 <div 
                     className="fixed left-[80px] z-[100] bg-slate-800 text-white text-xs px-3 py-1.5 rounded-lg shadow-xl border border-slate-700 animate-fade-in pointer-events-none"
@@ -568,8 +554,8 @@ const App = () => {
                 
                 <div className="w-10 h-[1px] bg-slate-800 shrink-0"></div>
 
-                {/* Lista de Empresas Desktop */}
-                <div className="flex-1 flex flex-col gap-3 w-full items-center overflow-y-auto custom-scrollbar px-2" style={{ overflowX: 'visible' }}>
+                {/* Lista de Empresas Desktop - CORRECCIÓN: SCROLL CONDICIONAL */}
+                <div className={`flex-1 flex flex-col gap-3 w-full items-center px-2 ${companies.length > 0 ? 'overflow-y-auto custom-scrollbar' : 'overflow-visible'}`} style={{ overflowX: 'visible' }}>
                     {companies.map(company => (
                         <div key={company.id} className="relative group w-full flex justify-center shrink-0">
                             {/* Indicador Activo */}
@@ -590,7 +576,7 @@ const App = () => {
                                 className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs transition-all duration-300 relative group-hover:scale-105 ${selectedCompanyId === company.id ? `${company.color} text-white shadow-lg` : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white'}`}
                             >
                                 {company.initials}
-                                {/* Botón eliminar (visible en hover, área de clic mejorada) */}
+                                {/* Botón eliminar */}
                                 <div 
                                     onClick={(e) => {e.stopPropagation(); handleDeleteCompany(company.id)}}
                                     className="absolute -top-2 -right-2 p-1 opacity-0 group-hover:opacity-100 transition hover:scale-110 cursor-pointer z-50"
@@ -605,9 +591,14 @@ const App = () => {
 
                     <button 
                         onClick={() => setIsCompanyModalOpen(true)}
-                        className="w-10 h-10 rounded-full bg-slate-800 border border-dashed border-slate-600 flex items-center justify-center text-slate-500 hover:text-white hover:border-indigo-500 hover:bg-slate-800 transition mt-2 shrink-0"
+                        className="w-10 h-10 rounded-full bg-slate-800 border border-dashed border-slate-600 flex items-center justify-center text-slate-500 hover:text-white hover:border-indigo-500 hover:bg-slate-800 transition mt-2 shrink-0 group relative"
                     >
                         <Plus size={20} />
+                        {isZeroState && (
+                            <span className="absolute left-14 bg-indigo-600 text-white text-xs px-2 py-1 rounded whitespace-nowrap animate-bounce z-50 shadow-lg">
+                                ¡Empieza aquí!
+                            </span>
+                        )}
                     </button>
                 </div>
 
@@ -617,137 +608,178 @@ const App = () => {
             </aside>
 
             {/* CONTENIDO PRINCIPAL */}
-            <div className="flex-1 flex flex-col min-w-0 bg-slate-950/50">
-                {/* Header Contextual */}
-                <header className="h-16 border-b border-slate-800 bg-slate-900/50 backdrop-blur px-4 md:px-6 flex items-center justify-between shrink-0 relative z-40">
-                    <div className="flex items-center gap-3">
-                        {/* Logo Mobile Only */}
-                        <div className="md:hidden bg-gradient-to-br from-orange-500 to-red-600 p-1.5 rounded-lg">
-                             <Rabbit size={18} className="text-white" />
+            <div className="flex-1 flex flex-col min-w-0 bg-slate-950/50 relative">
+                
+                {/* ZERO STATE - PANTALLA DE BIENVENIDA */}
+                {isZeroState ? (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center animate-fade-in z-50 bg-slate-950">
+                        <div className="w-24 h-24 bg-gradient-to-tr from-orange-500 to-red-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-orange-600/20 mb-8 animate-slide-up">
+                            <Rabbit size={48} className="text-white" />
                         </div>
-
-                        {/* Company Selector - CORREGIDO: Menú Modal Fijo en Móvil */}
-                        <div className="relative">
-                            <button 
-                                onClick={() => setIsCompanyDropdownOpen(!isCompanyDropdownOpen)}
-                                className="text-lg font-bold flex items-center gap-2 hover:bg-slate-800/50 p-2 rounded-lg transition"
-                            >
-                                {currentCompany.name}
-                                <ChevronDown size={16} className="text-slate-500" />
-                            </button>
-                            
-                            {/* Mobile/Desktop Company Dropdown */}
-                            {isCompanyDropdownOpen && (
-                                <>
-                                    <div className="fixed inset-0 z-[80] bg-black/50 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none" onClick={() => setIsCompanyDropdownOpen(false)}></div>
-                                    <div className="fixed md:absolute top-[70px] left-4 right-4 md:top-full md:left-0 md:right-auto md:w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-[90] p-2 animate-fade-in">
-                                        <div className="text-xs font-bold text-slate-500 uppercase px-3 py-2">Cambiar Empresa</div>
-                                        {companies.map(c => (
-                                            <button 
-                                                key={c.id}
-                                                onClick={() => { setSelectedCompanyId(c.id); setIsCompanyDropdownOpen(false); }}
-                                                className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-3 hover:bg-slate-800 transition ${selectedCompanyId === c.id ? 'bg-slate-800 text-white' : 'text-slate-400'}`}
-                                            >
-                                                <div className={`w-2 h-2 rounded-full ${c.color}`}></div>
-                                                {c.name}
-                                            </button>
-                                        ))}
-                                        <div className="h-[1px] bg-slate-800 my-2"></div>
-                                        <button 
-                                            onClick={() => { setIsCompanyModalOpen(true); setIsCompanyDropdownOpen(false); }}
-                                            className="w-full text-left px-3 py-2 rounded-lg flex items-center gap-3 text-indigo-400 hover:bg-indigo-500/10 transition text-sm font-medium"
-                                        >
-                                            <Plus size={14} /> Nueva Empresa
-                                        </button>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                        {/* View Switcher (Solo Calendario y Kanban ahora) */}
-                        <div className="hidden md:flex bg-slate-800 p-1 rounded-lg border border-slate-700">
-                            <button onClick={() => setView('calendar')} className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition ${view === 'calendar' ? 'bg-slate-700 text-white shadow' : 'text-slate-400 hover:text-slate-200'}`}>
-                                <CalendarIcon size={16} />
-                            </button>
-                            <button onClick={() => setView('kanban')} className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition ${view === 'kanban' ? 'bg-slate-700 text-white shadow' : 'text-slate-400 hover:text-slate-200'}`}>
-                                <LayoutGrid size={16} />
-                            </button>
-                        </div>
-                        <div className="hidden md:block h-6 w-[1px] bg-slate-800 mx-2"></div>
+                        <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 animate-slide-up" style={{animationDelay: '0.1s'}}>
+                            Bienvenido a Grilled Rabbit
+                        </h1>
+                        <p className="text-slate-400 max-w-md mb-8 animate-slide-up" style={{animationDelay: '0.2s'}}>
+                            Tu planificador de contenido definitivo. Crea tu primer espacio de trabajo para comenzar a organizar tus redes sociales.
+                        </p>
                         <button 
-                            onClick={() => handleNewPost()}
-                            className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 md:px-4 py-2 rounded-lg text-sm font-bold shadow-lg shadow-indigo-600/20 transition flex items-center gap-2"
+                            onClick={() => setIsCompanyModalOpen(true)}
+                            className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-xl font-bold text-lg shadow-lg shadow-indigo-600/30 transition flex items-center gap-3 animate-slide-up hover:scale-105"
+                            style={{animationDelay: '0.3s'}}
                         >
-                            <Plus size={18} /> <span className="hidden sm:inline">Nuevo Proyecto</span>
+                            <Plus size={24} /> Crear Empresa
                         </button>
                     </div>
-                </header>
+                ) : (
+                    <>
+                        {/* Header Contextual */}
+                        <header className="h-16 border-b border-slate-800 bg-slate-900/50 backdrop-blur px-4 md:px-6 flex items-center justify-between shrink-0 relative z-40 animate-fade-in">
+                            <div className="flex items-center gap-3">
+                                {/* Logo Mobile Only */}
+                                <div className="md:hidden bg-gradient-to-br from-orange-500 to-red-600 p-1.5 rounded-lg">
+                                     <Rabbit size={18} className="text-white" />
+                                </div>
 
-                <main className="flex-1 overflow-hidden p-4 md:p-6 relative">
-                    {/* View: Calendar */}
-                    {view === 'calendar' && (
-                        <CalendarView 
-                            posts={filteredPosts} 
-                            onEditPost={setEditingPost} 
-                            onNewPost={handleNewPost} 
-                            currentCompany={currentCompany}
-                        />
-                    )}
-
-                    {/* View: Kanban */}
-                    {view === 'kanban' && (
-                        <div className="h-full overflow-x-auto custom-scrollbar pb-20 md:pb-4">
-                            <div className="flex gap-4 md:gap-6 min-w-[1000px] h-full">
-                                {STATUS_COLUMNS.map(col => (
-                                    <div key={col.id} className="flex-1 min-w-[280px] flex flex-col h-full">
-                                        <div className={`flex items-center justify-between mb-4 border-b-2 ${col.color} pb-2 flex-shrink-0`}>
-                                            <div className="flex items-center gap-2 text-slate-200 font-bold">
-                                                <col.icon size={18} className={col.textColor} />
-                                                {col.label}
-                                            </div>
-                                            <span className="bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded-full border border-slate-700">
-                                                {filteredPosts.filter(p => p.status === col.id).length}
-                                            </span>
-                                        </div>
-
-                                        <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2">
-                                            {filteredPosts.filter(p => p.status === col.id).map(post => (
-                                                <div 
-                                                    key={post.id}
-                                                    onClick={() => setEditingPost(post)}
-                                                    className="bg-slate-800 p-4 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer group relative shadow-sm transition hover:shadow-md hover:bg-slate-800/80"
+                                {/* Company Selector */}
+                                <div className="relative">
+                                    <button 
+                                        onClick={() => setIsCompanyDropdownOpen(!isCompanyDropdownOpen)}
+                                        className="text-lg font-bold flex items-center gap-2 hover:bg-slate-800/50 p-2 rounded-lg transition"
+                                    >
+                                        {currentCompany?.name}
+                                        <ChevronDown size={16} className="text-slate-500" />
+                                    </button>
+                                    
+                                    {/* Mobile/Desktop Company Dropdown */}
+                                    {isCompanyDropdownOpen && (
+                                        <>
+                                            <div className="fixed inset-0 z-[80] bg-black/50 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none" onClick={() => setIsCompanyDropdownOpen(false)}></div>
+                                            <div className="fixed md:absolute top-[70px] left-4 right-4 md:top-full md:left-0 md:right-auto md:w-64 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-[90] p-2 animate-fade-in">
+                                                <div className="text-xs font-bold text-slate-500 uppercase px-3 py-2">Cambiar Empresa</div>
+                                                {companies.map(c => (
+                                                    <button 
+                                                        key={c.id}
+                                                        onClick={() => { setSelectedCompanyId(c.id); setIsCompanyDropdownOpen(false); }}
+                                                        className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-3 hover:bg-slate-800 transition ${selectedCompanyId === c.id ? 'bg-slate-800 text-white' : 'text-slate-400'}`}
+                                                    >
+                                                        <div className={`w-2 h-2 rounded-full ${c.color}`}></div>
+                                                        {c.name}
+                                                    </button>
+                                                ))}
+                                                <div className="h-[1px] bg-slate-800 my-2"></div>
+                                                <button 
+                                                    onClick={() => { setIsCompanyModalOpen(true); setIsCompanyDropdownOpen(false); }}
+                                                    className="w-full text-left px-3 py-2 rounded-lg flex items-center gap-3 text-indigo-400 hover:bg-indigo-500/10 transition text-sm font-medium"
                                                 >
-                                                    <div className="flex justify-between items-start mb-3">
-                                                        <div className={`p-1.5 rounded-md ${PLATFORMS.find(p=>p.id===post.platform)?.bg}`}>
-                                                            <PlatformIcon platformId={post.platform} />
-                                                        </div>
-                                                        {post.date && (
-                                                            <span className="text-[10px] bg-slate-900 px-2 py-1 rounded text-slate-400 flex items-center gap-1 border border-slate-800">
-                                                                <Clock size={10} /> {new Date(post.date).toLocaleDateString('es-ES', {day: 'numeric', month: 'short'})}
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                    <h4 className="text-sm font-semibold text-white mb-2 line-clamp-2">{post.title || "Sin título"}</h4>
-                                                    <div className="flex justify-between items-center mt-2">
-                                                        <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{post.type}</span>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                            <button 
-                                                onClick={() => handleNewPost()}
-                                                className="w-full py-3 border-2 border-dashed border-slate-800 rounded-xl text-slate-600 hover:border-slate-600 hover:text-slate-400 text-sm transition flex items-center justify-center gap-2 opacity-50 hover:opacity-100"
-                                            >
-                                                <Plus size={16} /> Añadir
-                                            </button>
-                                        </div>
-                                    </div>
-                                ))}
+                                                    <Plus size={14} /> Nueva Empresa
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    )}
-                </main>
+
+                            <div className="flex items-center gap-3">
+                                {/* View Switcher */}
+                                <div className="hidden md:flex bg-slate-800 p-1 rounded-lg border border-slate-700">
+                                    <button onClick={() => setView('calendar')} className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition ${view === 'calendar' ? 'bg-slate-700 text-white shadow' : 'text-slate-400 hover:text-slate-200'}`}>
+                                        <CalendarIcon size={16} />
+                                    </button>
+                                    <button onClick={() => setView('kanban')} className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition ${view === 'kanban' ? 'bg-slate-700 text-white shadow' : 'text-slate-400 hover:text-slate-200'}`}>
+                                        <LayoutGrid size={16} />
+                                    </button>
+                                </div>
+                                <div className="hidden md:block h-6 w-[1px] bg-slate-800 mx-2"></div>
+                                <button 
+                                    onClick={() => handleNewPost()}
+                                    className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 md:px-4 py-2 rounded-lg text-sm font-bold shadow-lg shadow-indigo-600/20 transition flex items-center gap-2"
+                                >
+                                    <Plus size={18} /> <span className="hidden sm:inline">Nuevo Proyecto</span>
+                                </button>
+                            </div>
+                        </header>
+
+                        <main className="flex-1 overflow-hidden p-4 md:p-6 relative animate-fade-in">
+                            {/* View: Calendar */}
+                            {view === 'calendar' && (
+                                <CalendarView 
+                                    posts={filteredPosts} 
+                                    onEditPost={setEditingPost} 
+                                    onNewPost={handleNewPost} 
+                                    currentCompany={currentCompany}
+                                />
+                            )}
+
+                            {/* View: Kanban */}
+                            {view === 'kanban' && (
+                                <div className="h-full overflow-x-auto custom-scrollbar pb-20 md:pb-4">
+                                    <div className="flex gap-4 md:gap-6 min-w-[1000px] h-full">
+                                        {STATUS_COLUMNS.map(col => (
+                                            <div key={col.id} className="flex-1 min-w-[280px] flex flex-col h-full">
+                                                <div className={`flex items-center justify-between mb-4 border-b-2 ${col.color} pb-2 flex-shrink-0`}>
+                                                    <div className="flex items-center gap-2 text-slate-200 font-bold">
+                                                        <col.icon size={18} className={col.textColor} />
+                                                        {col.label}
+                                                    </div>
+                                                    <span className="bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded-full border border-slate-700">
+                                                        {filteredPosts.filter(p => p.status === col.id).length}
+                                                    </span>
+                                                </div>
+
+                                                <div className="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2">
+                                                    {filteredPosts.filter(p => p.status === col.id).map(post => (
+                                                        <div 
+                                                            key={post.id}
+                                                            onClick={() => setEditingPost(post)}
+                                                            className="bg-slate-800 p-4 rounded-xl border border-slate-700 hover:border-indigo-500 cursor-pointer group relative shadow-sm transition hover:shadow-md hover:bg-slate-800/80"
+                                                        >
+                                                            <div className="flex justify-between items-start mb-3">
+                                                                <div className={`p-1.5 rounded-md ${PLATFORMS.find(p=>p.id===post.platform)?.bg}`}>
+                                                                    <PlatformIcon platformId={post.platform} />
+                                                                </div>
+                                                                {post.date && (
+                                                                    <span className="text-[10px] bg-slate-900 px-2 py-1 rounded text-slate-400 flex items-center gap-1 border border-slate-800">
+                                                                        <Clock size={10} /> {new Date(post.date).toLocaleDateString('es-ES', {day: 'numeric', month: 'short'})}
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                            <h4 className="text-sm font-semibold text-white mb-2 line-clamp-2">{post.title || "Sin título"}</h4>
+                                                            <div className="flex justify-between items-center mt-2">
+                                                                <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{post.type}</span>
+                                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    <button 
+                                                                        onClick={(e) => { e.stopPropagation(); moveStatus(post, -1); }}
+                                                                        disabled={col.id === 'pending'}
+                                                                        className="p-1.5 bg-slate-700 hover:bg-slate-600 rounded text-slate-300 disabled:opacity-0"
+                                                                    >
+                                                                        <ChevronLeft size={14} />
+                                                                    </button>
+                                                                    <button 
+                                                                        onClick={(e) => { e.stopPropagation(); moveStatus(post, 1); }}
+                                                                        disabled={col.id === 'published'}
+                                                                        className="p-1.5 bg-slate-700 hover:bg-slate-600 rounded text-slate-300 disabled:opacity-0"
+                                                                    >
+                                                                        <ChevronRight size={14} />
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                    <button 
+                                                        onClick={() => handleNewPost()}
+                                                        className="w-full py-3 border-2 border-dashed border-slate-800 rounded-xl text-slate-600 hover:border-slate-600 hover:text-slate-400 text-sm transition flex items-center justify-center gap-2 opacity-50 hover:opacity-100"
+                                                    >
+                                                        <Plus size={16} /> Añadir
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </main>
+                    </>
+                )}
             </div>
 
             {/* Modals */}
@@ -772,11 +804,13 @@ const App = () => {
                 isAlert={confirmConfig.isAlert}
             />
             
-            {/* Mobile Nav */}
-            <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur border-t border-slate-800 flex justify-around p-3 z-[60] pb-safe">
-                <button onClick={() => setView('calendar')} className={`flex flex-col items-center gap-1 ${view === 'calendar' ? 'text-indigo-500' : 'text-slate-500'}`}><CalendarIcon size={20} /><span className="text-[10px]">Calendario</span></button>
-                <button onClick={() => setView('kanban')} className={`flex flex-col items-center gap-1 ${view === 'kanban' ? 'text-indigo-500' : 'text-slate-500'}`}><LayoutGrid size={20} /><span className="text-[10px]">Proceso</span></button>
-            </nav>
+            {/* Mobile Nav (Solo si hay empresas) */}
+            {!isZeroState && (
+                <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900/90 backdrop-blur border-t border-slate-800 flex justify-around p-3 z-[60] pb-safe">
+                    <button onClick={() => setView('calendar')} className={`flex flex-col items-center gap-1 ${view === 'calendar' ? 'text-indigo-500' : 'text-slate-500'}`}><CalendarIcon size={20} /><span className="text-[10px]">Calendario</span></button>
+                    <button onClick={() => setView('kanban')} className={`flex flex-col items-center gap-1 ${view === 'kanban' ? 'text-indigo-500' : 'text-slate-500'}`}><LayoutGrid size={20} /><span className="text-[10px]">Proceso</span></button>
+                </nav>
+            )}
         </div>
     );
 };
